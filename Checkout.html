@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Checkout · Tie Laços</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Cormorant+Garamond:wght@500;600;700&family=DM+Serif+Display:ital@0;1&family=Quicksand:wght@500;600;700&family=Nunito:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles/tie.css" />
+<link rel="stylesheet" href="styles/account.css" />
+</head>
+<body data-active="">
+
+<div id="tie-top"></div>
+
+<main class="wrap co" data-screen-label="Checkout" id="co-root">
+  <div class="co__steps">
+    <b class="on">1. Carrinho</b><span>→</span>
+    <b class="on">2. Entrega &amp; Pagamento</b><span>→</span>
+    <b>3. Confirmação</b>
+  </div>
+
+  <div class="co__grid" id="co-grid">
+    <!-- Formulários -->
+    <div class="co__main">
+      <form id="co-form" novalidate>
+        <div class="co-section">
+          <h3><span class="num">1</span> Seus dados</h3>
+          <div class="field"><label>Nome completo</label><input type="text" name="name" placeholder="Quem vai receber" required /></div>
+          <div class="field field--row">
+            <div><label>E-mail</label><input type="email" name="email" placeholder="voce@email.com" required /></div>
+            <div><label>WhatsApp</label><input type="tel" name="phone" placeholder="(00) 00000-0000" required /></div>
+          </div>
+        </div>
+
+        <div class="co-section">
+          <h3><span class="num">2</span> Endereço de entrega</h3>
+          <div class="field field--row">
+            <div><label>CEP</label><input type="text" name="cep" placeholder="00000-000" required /></div>
+            <div><label>Número</label><input type="text" name="num" placeholder="123" required /></div>
+          </div>
+          <div class="field"><label>Rua / Logradouro</label><input type="text" name="street" placeholder="Rua das Flores" required /></div>
+          <div class="field field--row">
+            <div><label>Bairro</label><input type="text" name="district" placeholder="Centro" required /></div>
+            <div><label>Complemento</label><input type="text" name="comp" placeholder="Apto, casa…" /></div>
+          </div>
+          <div class="field field--row">
+            <div><label>Cidade</label><input type="text" name="city" placeholder="Sua cidade" required /></div>
+            <div><label>Estado</label>
+              <select name="uf" required>
+                <option value="">UF</option><option>SP</option><option>RJ</option><option>MG</option><option>RS</option><option>PR</option><option>SC</option><option>BA</option><option>Outro</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="co-section">
+          <h3><span class="num">3</span> Frete</h3>
+          <div class="ship-opts" id="ship-opts">
+            <label class="ship-opt on"><input type="radio" name="ship" value="9.90" data-label="Sedex" checked>
+              <span class="so-t"><b>Sedex</b><span>Chega em 2-4 dias úteis</span></span><span class="so-p">R$ 9,90</span></label>
+            <label class="ship-opt"><input type="radio" name="ship" value="0" data-label="PAC">
+              <span class="so-t"><b>PAC econômico</b><span>Chega em 5-9 dias úteis</span></span><span class="so-p">Grátis</span></label>
+            <label class="ship-opt"><input type="radio" name="ship" value="19.90" data-label="Motoboy">
+              <span class="so-t"><b>Motoboy (capital)</b><span>Hoje, se pedir até 14h</span></span><span class="so-p">R$ 19,90</span></label>
+          </div>
+        </div>
+
+        <div class="co-section">
+          <h3><span class="num">4</span> Pagamento</h3>
+          <div class="pay-tabs">
+            <button class="pay-tab on" type="button" data-pay="pix">🔑 PIX</button>
+            <button class="pay-tab" type="button" data-pay="card">💳 Cartão</button>
+            <button class="pay-tab" type="button" data-pay="boleto">📄 Boleto</button>
+          </div>
+          <div class="pay-panel on" data-pay-panel="pix">
+            <div class="pix-box">
+              <div class="qr" aria-hidden="true"></div>
+              <p style="font-weight:800;color:var(--texto)">5% de desconto no PIX!</p>
+              <p style="color:var(--muted);font-size:.9rem">Escaneie o QR ou copie o código na confirmação.</p>
+            </div>
+          </div>
+          <div class="pay-panel" data-pay-panel="card">
+            <div class="field"><label>Número do cartão</label><input type="text" name="card" placeholder="0000 0000 0000 0000" /></div>
+            <div class="field"><label>Nome impresso</label><input type="text" name="cardname" placeholder="Como está no cartão" /></div>
+            <div class="field field--row">
+              <div><label>Validade</label><input type="text" name="exp" placeholder="MM/AA" /></div>
+              <div><label>CVV</label><input type="text" name="cvv" placeholder="123" /></div>
+            </div>
+            <div class="field"><label>Parcelas</label>
+              <select name="inst"><option>1x sem juros</option><option>2x sem juros</option><option>3x sem juros</option></select>
+            </div>
+          </div>
+          <div class="pay-panel" data-pay-panel="boleto">
+            <p style="color:var(--muted)">O boleto será gerado na confirmação e vence em 3 dias úteis. O pedido é preparado após a compensação.</p>
+          </div>
+        </div>
+
+        <button class="btn btn--block btn--lg" type="submit" style="margin-top:.4rem">Finalizar pedido</button>
+      </form>
+    </div>
+
+    <!-- Resumo -->
+    <aside class="co-summary">
+      <h3>Resumo do pedido</h3>
+      <div id="co-items"></div>
+      <div class="co-coupon">
+        <input type="text" id="coupon" placeholder="Cupom (ex: BEMVINDA10)" />
+        <button type="button" id="coupon-btn">Aplicar</button>
+      </div>
+      <div class="co-totals">
+        <div class="row"><span>Subtotal</span><span id="t-sub">R$ 0,00</span></div>
+        <div class="row muted" id="t-disc-row" style="display:none"><span>Desconto</span><span id="t-disc">- R$ 0,00</span></div>
+        <div class="row"><span>Frete</span><span id="t-ship">R$ 9,90</span></div>
+        <div class="grand"><span>Total</span><b id="t-grand">R$ 0,00</b></div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div id="tie-bottom"></div>
+<div id="tie-tweaks-root"></div>
+
+<script src="scripts/products.js"></script>
+<script src="scripts/chrome.js"></script>
+<script src="scripts/tie.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="scripts/tie-tweaks.jsx"></script>
+
+<script>
+(function () {
+  var brl = window.tieBRL;
+  var KEY = 'tie_cart';
+  var cart = {};
+  try { cart = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+  var ids = Object.keys(cart);
+  var state = { ship: 9.90, discount: 0, coupon: '' };
+
+  var itemsEl = document.getElementById('co-items');
+
+  // Carrinho vazio
+  if (!ids.length) {
+    document.getElementById('co-grid').innerHTML =
+      '<div class="co-empty" style="grid-column:1/-1">' +
+      '<span class="bow"><svg viewBox="0 0 48 32"><polygon points="22,16 4,4 4,28" fill="currentColor"/><polygon points="26,16 44,4 44,28" fill="currentColor"/><rect x="20" y="11" width="8" height="10" rx="3" fill="currentColor"/></svg></span>' +
+      '<p style="font-family:var(--font-head);font-size:1.6rem;color:var(--texto)">Seu carrinho está vazinho</p>' +
+      '<p>Que tal escolher um laço feito à mão?</p>' +
+      '<a class="btn btn--lg" href="Catalogo.html" style="margin-top:1rem">Ver coleção</a></div>';
+    document.querySelector('.co__steps').style.display = 'none';
+    return;
+  }
+
+  function subtotal() {
+    return ids.reduce(function (s, id) { return s + cart[id].price * cart[id].qty; }, 0);
+  }
+  function renderItems() {
+    itemsEl.innerHTML = ids.map(function (id) {
+      var i = cart[id];
+      return '<div class="co-line"><span class="ph" data-label="foto"></span>' +
+        '<span class="ci-t"><b>' + i.name + '</b><span>' + (i.cat || '') + ' · Qtd ' + i.qty + '</span></span>' +
+        '<span class="ci-p">' + brl(i.price * i.qty) + '</span></div>';
+    }).join('');
+  }
+  function renderTotals() {
+    var sub = subtotal();
+    var disc = state.discount;
+    document.getElementById('t-sub').textContent = brl(sub);
+    var dRow = document.getElementById('t-disc-row');
+    if (disc > 0) { dRow.style.display = ''; document.getElementById('t-disc').textContent = '- ' + brl(disc); }
+    else dRow.style.display = 'none';
+    document.getElementById('t-ship').textContent = state.ship > 0 ? brl(state.ship) : 'Grátis';
+    document.getElementById('t-grand').textContent = brl(Math.max(0, sub - disc) + state.ship);
+  }
+  renderItems(); renderTotals();
+
+  // Frete
+  document.getElementById('ship-opts').addEventListener('change', function (e) {
+    document.querySelectorAll('.ship-opt').forEach(function (o) { o.classList.remove('on'); });
+    e.target.closest('.ship-opt').classList.add('on');
+    state.ship = parseFloat(e.target.value);
+    renderTotals();
+  });
+
+  // Cupom
+  document.getElementById('coupon-btn').addEventListener('click', function () {
+    var code = document.getElementById('coupon').value.trim().toUpperCase();
+    if (code === 'BEMVINDA10') {
+      state.discount = subtotal() * 0.10; state.coupon = code;
+      window.TIE.toast('Cupom aplicado! 10% de carinho 🎀');
+    } else if (code === 'FRETEGRATIS') {
+      state.ship = 0; window.TIE.toast('Frete grátis aplicado! 🎀');
+      document.querySelectorAll('.ship-opt').forEach(function (o) { o.classList.remove('on'); });
+    } else {
+      state.discount = 0; window.TIE.toast('Cupom inválido 😢');
+    }
+    renderTotals();
+  });
+
+  // Tabs pagamento
+  document.querySelector('.pay-tabs').addEventListener('click', function (e) {
+    var b = e.target.closest('.pay-tab'); if (!b) return;
+    this.querySelectorAll('.pay-tab').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    document.querySelectorAll('.pay-panel').forEach(function (pnl) {
+      pnl.classList.toggle('on', pnl.dataset.payPanel === b.dataset.pay);
+    });
+  });
+
+  // Finalizar
+  document.getElementById('co-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var ok = true;
+    this.querySelectorAll('[required]').forEach(function (inp) {
+      var bad = (inp.type === 'email') ? !/\S+@\S+\.\S+/.test(inp.value) : !inp.value.trim();
+      inp.classList.toggle('bad', bad);
+      if (bad) ok = false;
+    });
+    if (!ok) {
+      window.TIE.toast('Confira os campos destacados 🎀');
+      var first = this.querySelector('.bad'); if (first) first.focus();
+      return;
+    }
+    var order = 'TIE-' + Math.floor(100000 + Math.random() * 900000);
+    var grand = document.getElementById('t-grand').textContent;
+    localStorage.removeItem(KEY);
+    window.TIE && window.TIE.toast('Pedido confirmado! 🎀');
+    document.getElementById('co-root').innerHTML =
+      '<div class="co-success">' +
+        '<div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></div>' +
+        '<h1>Pedido confirmado!</h1>' +
+        '<p>Obrigada pela confiança 💕 Seu pedido <b>' + order + '</b> já entrou na nossa listinha. Você vai receber os detalhes no e-mail e no WhatsApp.</p>' +
+        '<p style="font-weight:800;color:var(--texto)">Total: ' + grand + '</p>' +
+        '<div style="display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;margin-top:1.4rem">' +
+          '<a class="btn btn--lg" href="Catalogo.html">Continuar comprando</a>' +
+          '<a class="btn btn--ghost btn--lg" href="Home.html">Voltar ao início</a>' +
+        '</div>' +
+      '</div>';
+    document.querySelector('.co__steps') && (document.querySelector('.co__steps').style.display = 'none');
+    if (window.TIE) { var c = document.querySelectorAll('.cart-count'); c.forEach(function (x){ x.textContent='0'; x.classList.remove('show'); }); }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Produto · Tie Laços</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Cormorant+Garamond:wght@500;600;700&family=DM+Serif+Display:ital@0;1&family=Quicksand:wght@500;600;700&family=Nunito:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles/tie.css" />
+<link rel="stylesheet" href="styles/product.css" />
+</head>
+<body data-active="catalogo">
+
+<div id="tie-top"></div>
+
+<main class="wrap pdp" data-screen-label="Produto">
+  <nav class="pdp__crumbs">
+    <a href="Home.html">Início</a><span>/</span>
+    <a href="Catalogo.html">Catálogo</a><span>/</span>
+    <b id="pdp-crumb">Produto</b>
+  </nav>
+
+  <div class="pdp__top">
+    <!-- Galeria -->
+    <div class="gallery">
+      <div class="gallery__main">
+        <span class="gallery__badge" id="pdp-badge" style="display:none"></span>
+        <span class="ph" id="pdp-main" data-label="foto do produto"></span>
+      </div>
+      <div class="gallery__thumbs" id="pdp-thumbs"></div>
+    </div>
+
+    <!-- Info -->
+    <div class="pdp__info">
+      <span class="pdp__cat" id="pdp-cat">Laços</span>
+      <h1 class="pdp__title" id="pdp-title">Produto</h1>
+      <div class="pdp__rate">
+        <span class="stars">★★★★★</span>
+        <span id="pdp-rate">4,9</span>
+        <span>·</span>
+        <a href="#aval" id="pdp-reviews" style="color:var(--rosa-escuro);font-weight:700">128 avaliações</a>
+      </div>
+      <div class="pdp__price">
+        <b id="pdp-price">R$ 0,00</b>
+        <s id="pdp-old" style="display:none"></s>
+        <span class="save" id="pdp-save" style="display:none"></span>
+      </div>
+      <p class="pdp__install" id="pdp-install">ou <b>3x sem juros</b> no cartão</p>
+
+      <p class="pdp__desc" id="pdp-desc">Laço artesanal feito à mão com cetim macio e acabamento caprichado. Cada peça é única — pensada para o conforto e a fofura da sua pequena.</p>
+
+      <div class="opt">
+        <div class="opt__label">Cor <span id="pdp-colorname"></span></div>
+        <div class="opt__row" id="pdp-colors"></div>
+      </div>
+
+      <div class="opt">
+        <div class="opt__label">Tamanho da presilha</div>
+        <div class="opt__row">
+          <button class="size-opt on" type="button">PP<small>0-6m</small></button>
+          <button class="size-opt" type="button">P<small>6-18m</small></button>
+          <button class="size-opt" type="button">M<small>2-4a</small></button>
+          <button class="size-opt" type="button">G<small>5a+</small></button>
+        </div>
+      </div>
+
+      <div class="buybar">
+        <div class="qtybox">
+          <button type="button" id="qminus" aria-label="Diminuir">–</button>
+          <span id="qval">1</span>
+          <button type="button" id="qplus" aria-label="Aumentar">+</button>
+        </div>
+        <button class="btn btn--lg js-pdp-add" type="button">Adicionar ao carrinho</button>
+      </div>
+
+      <div class="pdp__perks">
+        <div class="perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9.2-9C1.3 8 3 4.8 6.2 4.8c2 0 3.2 1.3 3.8 2.3.6-1 1.8-2.3 3.8-2.3 3.2 0 4.9 3.2 3.4 6.2C19 15.5 12 20 12 20Z"/></svg> Feito à mão, peça por peça</div>
+        <div class="perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M3 8l3-4h12l3 4M12 4v4"/></svg> Vai em embalagem presente</div>
+        <div class="perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg> Tecido macio e seguro para a pele dela</div>
+        <div class="perk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h13v10H3zM16 10h3l2 3v4h-5"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg> Frete grátis acima de R$ 150</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Abas -->
+  <section class="pdp__tabs" id="aval">
+    <div class="tabbar">
+      <button class="on" type="button" data-tab="desc">Descrição</button>
+      <button type="button" data-tab="spec">Detalhes</button>
+      <button type="button" data-tab="ship">Entrega &amp; trocas</button>
+    </div>
+    <div class="tabpanel on" data-panel="desc">
+      <p>Cada laço da Tie nasce no nosso ateliê, feito à mão com calma e carinho. Selecionamos tecidos macios e seguros, com acabamento reforçado para durar muitas fotos, passeios e sorrisos.</p>
+      <h4>Por que as mamães amam</h4>
+      <ul>
+        <li>Presilha de bico de pato revestida — não machuca a cabecinha.</li>
+        <li>Acabamento à prova de desfiar.</li>
+        <li>Peça única, feita sob encomenda com amor.</li>
+      </ul>
+    </div>
+    <div class="tabpanel" data-panel="spec">
+      <dl class="spec">
+        <dt>Material</dt><dd>Cetim / gorgurão premium</dd>
+        <dt>Presilha</dt><dd>Bico de pato revestido</dd>
+        <dt>Feito à mão</dt><dd>Sim, no ateliê Tie</dd>
+        <dt>Cuidados</dt><dd>Lavar à mão, secar à sombra</dd>
+        <dt>Garantia</dt><dd>30 dias contra defeitos</dd>
+      </dl>
+    </div>
+    <div class="tabpanel" data-panel="ship">
+      <h4>Entrega</h4>
+      <p>Enviamos para todo o Brasil. Frete grátis acima de R$ 150. Por ser feito à mão sob encomenda, o preparo leva de 2 a 4 dias úteis antes da postagem.</p>
+      <h4>Trocas</h4>
+      <p>Você tem até 7 dias após o recebimento para solicitar troca ou devolução, conforme o Código de Defesa do Consumidor.</p>
+    </div>
+  </section>
+
+  <!-- Relacionados -->
+  <section class="related">
+    <h2>Você também vai amar</h2>
+    <div class="related-grid" id="related"></div>
+  </section>
+</main>
+
+<div id="tie-bottom"></div>
+<div id="tie-tweaks-root"></div>
+
+<script src="scripts/products.js"></script>
+<script src="scripts/chrome.js"></script>
+<script src="scripts/tie.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="scripts/tie-tweaks.jsx"></script>
+
+<script>
+(function () {
+  var brl = window.tieBRL;
+  var params = new URLSearchParams(location.search);
+  var id = params.get('id') || 'p1';
+  var p = window.tieProduct(id) || window.TIE_PRODUCTS[0];
+  var colNames = { '#E0579A':'Rosa', '#C4167A':'Rosa escuro', '#7C2D6E':'Vinho', '#F8D7EA':'Rosa clarinho', '#FFFFFF':'Branco' };
+
+  document.title = p.name + ' · Tie Laços';
+  document.getElementById('pdp-crumb').textContent = p.name;
+  document.getElementById('pdp-cat').textContent = p.cat;
+  document.getElementById('pdp-title').textContent = p.name;
+  document.getElementById('pdp-rate').textContent = (p.rating + '').replace('.', ',');
+  document.getElementById('pdp-reviews').textContent = p.reviews + ' avaliações';
+  document.getElementById('pdp-price').textContent = brl(p.price);
+  document.getElementById('pdp-main').setAttribute('data-label', 'foto · ' + p.name);
+  if (p.old) {
+    document.getElementById('pdp-old').textContent = brl(p.old);
+    document.getElementById('pdp-old').style.display = '';
+    var pct = Math.round((1 - p.price / p.old) * 100);
+    var save = document.getElementById('pdp-save');
+    save.textContent = '-' + pct + '%'; save.style.display = '';
+  }
+  document.getElementById('pdp-install').innerHTML = 'ou <b>3x de ' + brl(p.price / 3) + '</b> sem juros';
+  if (p.badge) {
+    var b = document.getElementById('pdp-badge');
+    b.textContent = p.badge; b.style.display = '';
+    if (p.alt) b.style.background = 'var(--vinho)';
+  }
+
+  // Thumbs
+  document.getElementById('pdp-thumbs').innerHTML = [0,1,2,3].map(function (i) {
+    return '<div class="gthumb' + (i === 0 ? ' on' : '') + '"><span class="ph" data-label="' + (i+1) + '"></span></div>';
+  }).join('');
+  document.getElementById('pdp-thumbs').addEventListener('click', function (e) {
+    var t = e.target.closest('.gthumb'); if (!t) return;
+    this.querySelectorAll('.gthumb').forEach(function (x) { x.classList.remove('on'); });
+    t.classList.add('on');
+  });
+
+  // Cores
+  var colorname = document.getElementById('pdp-colorname');
+  colorname.textContent = colNames[p.cols[0]] || '';
+  document.getElementById('pdp-colors').innerHTML = p.cols.map(function (c, i) {
+    return '<button class="color-opt' + (i === 0 ? ' on' : '') + '" type="button" data-col="' + c + '" style="background:' + c + '" aria-label="' + (colNames[c] || c) + '"></button>';
+  }).join('');
+  document.getElementById('pdp-colors').addEventListener('click', function (e) {
+    var b = e.target.closest('.color-opt'); if (!b) return;
+    this.querySelectorAll('.color-opt').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    colorname.textContent = colNames[b.dataset.col] || '';
+  });
+
+  // Tamanho
+  document.querySelectorAll('.size-opt').forEach(function (s) {
+    s.addEventListener('click', function () {
+      document.querySelectorAll('.size-opt').forEach(function (x) { x.classList.remove('on'); });
+      s.classList.add('on');
+    });
+  });
+
+  // Qtd
+  var q = 1;
+  var qval = document.getElementById('qval');
+  document.getElementById('qminus').addEventListener('click', function () { q = Math.max(1, q - 1); qval.textContent = q; });
+  document.getElementById('qplus').addEventListener('click', function () { q = Math.min(20, q + 1); qval.textContent = q; });
+
+  // Add to cart
+  document.querySelector('.js-pdp-add').addEventListener('click', function () {
+    window.TIE.addToCart({ id: p.id, name: p.name, price: p.price, cat: p.cat, qty: q });
+    window.TIE.toast('Adicionado ao carrinho!');
+    window.TIE.openCart();
+  });
+
+  // Abas
+  document.querySelector('.tabbar').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    this.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+    document.querySelectorAll('.tabpanel').forEach(function (pnl) {
+      pnl.classList.toggle('on', pnl.dataset.panel === b.dataset.tab);
+    });
+  });
+
+  // Relacionados (mesma categoria, exceto o atual)
+  var rel = window.TIE_PRODUCTS.filter(function (x) { return x.cat === p.cat && x.id !== p.id; });
+  if (rel.length < 4) {
+    window.TIE_PRODUCTS.forEach(function (x) { if (x.id !== p.id && rel.indexOf(x) === -1 && rel.length < 4) rel.push(x); });
+  }
+  document.getElementById('related').innerHTML = rel.slice(0, 4).map(function (x) { return window.tieCard(x); }).join('');
+})();
+</script>
+
+</body>
+</html>

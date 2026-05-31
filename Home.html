@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tie Laços · Laços artesanais feitos à mão com amor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=Cormorant+Garamond:wght@500;600;700&family=DM+Serif+Display:ital@0;1&family=Quicksand:wght@500;600;700&family=Nunito:wght@400;500;600;700;800&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles/tie.css" />
+<link rel="stylesheet" href="styles/home.css" />
+</head>
+<body data-active="inicio">
+
+<!-- ===== Chrome (topbar, header, menu mobile, busca) ===== -->
+<div id="tie-top"></div>
+
+<main>
+  <!-- ===== Banner (hero) ===== -->
+  <section class="banner">
+    <!-- Imagem de fundo do banner — troque o src pela sua foto (ex: assets/banner.jpg) -->
+    <div class="ph banner__bg" data-label="imagem de fundo do banner — envie sua foto"></div>
+    <div class="banner__overlay" aria-hidden="true"></div>
+    <div class="wrap banner__in">
+      <div class="banner__copy">
+        <span class="eyebrow">feito à mão, com amor</span>
+        <h1>Laços que guardam<br><em>memórias</em> de menina.</h1>
+        <p>Acessórios e roupinhas artesanais para as pequenas. Cada laço é feito à mão, com cuidado de quem ama — pra ela se sentir tão especial quanto ela é.</p>
+        <div class="hero__cta">
+          <a href="Catalogo.html" class="btn btn--lg">Ver coleção</a>
+          <a href="#kit" class="btn btn--ghost btn--lg">Montar kit presente</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Categorias ===== -->
+  <section class="section section--tint">
+    <div class="wrap">
+      <div class="sec-head center reveal">
+        <span class="kicker center">Escolha por categoria</span>
+        <h2>Tudo feito à mão, do laço ao look</h2>
+        <p>Peças pensadas com carinho para cada fase — do recém-nascido à pré-escola.</p>
+      </div>
+      <div class="grid grid--4 cats">
+        <a class="cat reveal" href="Catalogo.html">
+          <div class="ph" data-label="foto · laços"></div>
+          <div class="cat__b"><h3>Laços</h3><span>72 peças</span></div>
+        </a>
+        <a class="cat reveal" href="Catalogo.html">
+          <div class="ph" data-label="foto · tiaras &amp; faixas"></div>
+          <div class="cat__b"><h3>Tiaras &amp; Faixas</h3><span>38 peças</span></div>
+        </a>
+        <a class="cat reveal" href="Catalogo.html">
+          <div class="ph" data-label="foto · roupinhas"></div>
+          <div class="cat__b"><h3>Roupinhas</h3><span>26 peças</span></div>
+        </a>
+        <a class="cat reveal" href="Catalogo.html">
+          <div class="ph" data-label="foto · kits presente"></div>
+          <div class="cat__b"><h3>Kits Presente</h3><span>15 kits</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Produtos em destaque ===== -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head reveal" style="display:flex;justify-content:space-between;align-items:flex-end;max-width:none;gap:1rem;flex-wrap:wrap">
+        <div>
+          <span class="kicker">Queridinhos da loja</span>
+          <h2>Mais amados pelas mamães</h2>
+        </div>
+        <a href="Catalogo.html" class="btn btn--ghost">Ver tudo</a>
+      </div>
+      <div class="grid grid--4" id="featured"></div>
+    </div>
+  </section>
+
+  <!-- ===== Sobre o artesanal ===== -->
+  <section class="section section--rosa" id="sobre">
+    <div class="wrap about">
+      <div class="about__art reveal">
+        <div class="ph about__img" data-label="foto — mãos fazendo um laço"></div>
+        <div class="ph about__img2" data-label="ateliê"></div>
+        <div class="about__bow" aria-hidden="true">
+          <svg viewBox="0 0 48 32"><polygon points="22,16 4,4 4,28" fill="currentColor"/><polygon points="26,16 44,4 44,28" fill="currentColor"/><rect x="20" y="11" width="8" height="10" rx="3" fill="currentColor"/></svg>
+        </div>
+      </div>
+      <div class="about__copy reveal">
+        <span class="eyebrow">nossa história</span>
+        <h2>Cada laço nasce de um gesto de amor</h2>
+        <p>A Tie começou numa mesa de casa, com tecidos macios, linha, paciência e o desejo de fazer algo bonito para uma menininha. Hoje seguimos do mesmo jeito: laço por laço, feito à mão, sem pressa.</p>
+        <p>Não é só um acessório — é aquele detalhe que vira memória afetiva, foto guardada, presente que emociona.</p>
+        <ul class="promises">
+          <li><span class="pi">✿</span> Feito à mão, peça por peça</li>
+          <li><span class="pi">✿</span> Tecidos macios e seguros para a pele dela</li>
+          <li><span class="pi">✿</span> Embalagem presente em todo pedido</li>
+        </ul>
+        <p class="sign">com amor, <b>Tie Laços</b></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Monte seu kit ===== -->
+  <section class="kitband" id="kit">
+    <div class="wrap kitband__in js-kit">
+      <div class="kitband__copy reveal">
+        <span class="eyebrow" style="color:var(--rosa-claro)">monte com carinho</span>
+        <h2>Monte seu kit presente</h2>
+        <p>Escolha os itens e crie um presente único. Junte <b>3 ou mais</b> e ganhe <b>10% de carinho</b> no kit. Vai numa caixinha linda, pronta pra presentear.</p>
+        <div class="kit__summary">
+          <div>
+            <span class="js-kit-disc kit__disc">−10% aplicado 🎀</span>
+            <div class="kit__total-row">Total do kit <b class="js-kit-total">R$ 0,00</b></div>
+          </div>
+          <button class="btn btn--lg js-kit-add" disabled>Adicionar kit ao carrinho</button>
+        </div>
+      </div>
+      <div class="kit__items reveal">
+        <label class="kit-item">
+          <input type="checkbox" data-price="49.90" />
+          <div class="ph" data-label="laço"></div>
+          <div class="kit-item__t"><b>Laço Cereja</b><span>R$ 49,90</span></div>
+          <span class="kit-item__chk" aria-hidden="true"></span>
+        </label>
+        <label class="kit-item">
+          <input type="checkbox" data-price="39.90" />
+          <div class="ph" data-label="faixa"></div>
+          <div class="kit-item__t"><b>Faixa Pérola</b><span>R$ 39,90</span></div>
+          <span class="kit-item__chk" aria-hidden="true"></span>
+        </label>
+        <label class="kit-item">
+          <input type="checkbox" data-price="24.90" />
+          <div class="ph" data-label="meia"></div>
+          <div class="kit-item__t"><b>Meia Pompom</b><span>R$ 24,90</span></div>
+          <span class="kit-item__chk" aria-hidden="true"></span>
+        </label>
+        <label class="kit-item">
+          <input type="checkbox" data-price="59.90" />
+          <div class="ph" data-label="tiara"></div>
+          <div class="kit-item__t"><b>Tiara Florzinha</b><span>R$ 59,90</span></div>
+          <span class="kit-item__chk" aria-hidden="true"></span>
+        </label>
+        <label class="kit-item">
+          <input type="checkbox" data-price="19.90" />
+          <div class="ph" data-label="caixa"></div>
+          <div class="kit-item__t"><b>Caixa Presente</b><span>R$ 19,90</span></div>
+          <span class="kit-item__chk" aria-hidden="true"></span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Depoimentos ===== -->
+  <section class="section section--tint">
+    <div class="wrap">
+      <div class="sec-head center reveal">
+        <span class="kicker center">Quem leva, ama</span>
+        <h2>O carinho de quem já presenteou</h2>
+      </div>
+      <div class="grid grid--3">
+        <figure class="quote reveal">
+          <div class="stars">★★★★★</div>
+          <blockquote>“Chegou tudo lindo e embalado com tanto capricho que parecia presente de loja grande. Minha filha não tira o laço da cabeça!”</blockquote>
+          <figcaption><span class="av">M</span><div><b>Marina S.</b><small>mãe da Helena, 3 anos</small></div></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <div class="stars">★★★★★</div>
+          <blockquote>“Comprei o kit presente para minha afilhada e foi o presente mais elogiado do chá. Dá pra sentir que é feito à mão.”</blockquote>
+          <figcaption><span class="av">C</span><div><b>Carla M.</b><small>madrinha da Liz</small></div></figcaption>
+        </figure>
+        <figure class="quote reveal">
+          <div class="stars">★★★★★</div>
+          <blockquote>“Os tecidos são macios de verdade, não machucam a cabecinha dela. Virei cliente fiel, já é a quarta compra.”</blockquote>
+          <figcaption><span class="av">R</span><div><b>Renata A.</b><small>vovó coruja da Cecília</small></div></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Newsletter ===== -->
+  <section class="news">
+    <div class="wrap news__in reveal">
+      <div class="news__bow" aria-hidden="true">
+        <svg viewBox="0 0 48 32"><polygon points="22,16 4,4 4,28" fill="currentColor"/><polygon points="26,16 44,4 44,28" fill="currentColor"/><rect x="20" y="11" width="8" height="10" rx="3" fill="currentColor"/></svg>
+      </div>
+      <h2>Ganhe 10% no primeiro laço</h2>
+      <p>Entre pra nossa lista e receba o cupom <b>BEMVINDA10</b>, novidades e lançamentos em primeira mão.</p>
+      <form class="js-news news__form" novalidate>
+        <input type="email" placeholder="seu melhor e-mail" aria-label="E-mail" required />
+        <button class="btn btn--lg" type="submit">Quero meu cupom</button>
+      </form>
+      <small>Sem spam. Só fofura. 🎀</small>
+    </div>
+  </section>
+
+  <!-- ===== Instagram ===== -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head center reveal">
+        <span class="kicker center">@tielacos</span>
+        <h2>Siga a gente no Instagram</h2>
+        <p>Bastidores do ateliê, lançamentos e as pequenas usando seus laços.</p>
+      </div>
+      <div class="grid grid--4 iggrid">
+        <a class="ig reveal" href="#"><div class="ph" data-label="@tielacos"></div></a>
+        <a class="ig reveal" href="#"><div class="ph" data-label="@tielacos"></div></a>
+        <a class="ig reveal" href="#"><div class="ph" data-label="@tielacos"></div></a>
+        <a class="ig reveal" href="#"><div class="ph" data-label="@tielacos"></div></a>
+      </div>
+      <div class="center reveal" style="text-align:center;margin-top:2rem">
+        <a href="#" class="btn btn--vinho">Seguir @tielacos</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===== Chrome (footer + carrinho) ===== -->
+<div id="tie-bottom"></div>
+
+<!-- ===== Tweaks ===== -->
+<div id="tie-tweaks-root"></div>
+
+<!-- ===== Scripts ===== -->
+<script src="scripts/products.js"></script>
+<script src="scripts/chrome.js"></script>
+<script src="scripts/tie.js"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="scripts/tie-tweaks.jsx"></script>
+
+<!-- ===== Produtos em destaque (render) ===== -->
+<script>
+(function () {
+  var el = document.getElementById('featured');
+  if (!el || !window.TIE_PRODUCTS) return;
+  var pick = ['p1','p6','p3','p4','p2','p10','p7','p9'];
+  el.innerHTML = pick.map(function (id) {
+    var p = window.tieProduct(id);
+    return p ? window.tieCard(p, { reveal: true }) : '';
+  }).join('');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('#featured .reveal').forEach(function (n) { io.observe(n); });
+  }
+})();
+</script>
+
+</body>
+</html>
