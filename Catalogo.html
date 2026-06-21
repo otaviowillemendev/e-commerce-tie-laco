@@ -89,127 +89,115 @@
 <div id="tie-bottom"></div>
 <div id="tie-tweaks-root"></div>
 
+<script src="/scripts/shopify-client.js"></script>
 <script src="/scripts/products.js"></script>
 <script src="/scripts/chrome.js"></script>
 <script src="/scripts/tie.js"></script>
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-<script type="text/babel" src="/tweaks-panel.jsx"></script>
-<script type="text/babel" src="/scripts/tie-tweaks.jsx"></script>
 
 <script>
 (function () {
-  var P = window.TIE_PRODUCTS, CATS = window.TIE_CATS, brl = window.tieBRL;
-  var state = { cats: [], maxPrice: 180, color: null, sort: 'relev' };
+  var CATS = window.TIE_CATS, brl = window.tieBRL;
+  var state = { cats: [], maxPrice: 500, color: null, sort: 'relev' };
+  var ALL_PRODUCTS = [];
 
-  // Pré-seleção por ?cat=
   var params = new URLSearchParams(location.search);
-  var qcat = params.get('cat');
-  var catMap = { lacos:'Laços', roupinhas:'Roupinhas', kits:'Kits', tiaras:'Tiaras', faixas:'Faixas' };
+  var qcat   = params.get('cat');
+  var catMap  = { lacos:'Laços', roupinhas:'Roupinhas', kits:'Kits', tiaras:'Tiaras', faixas:'Faixas' };
   if (qcat && catMap[qcat]) {
     state.cats = [catMap[qcat]];
     document.getElementById('cat-title').textContent = (CATS.find(function(c){return c.key===catMap[qcat];})||{}).label || 'Coleção';
     document.getElementById('crumb-cat').textContent = document.getElementById('cat-title').textContent;
   }
 
-  // Render filtros de categoria
-  var fcats = document.getElementById('f-cats');
-  fcats.innerHTML = CATS.map(function (c) {
-    var n = P.filter(function (p) { return p.cat === c.key; }).length;
-    var on = state.cats.indexOf(c.key) > -1 ? 'checked' : '';
-    return '<label class="fopt"><input type="checkbox" value="' + c.key + '" ' + on + '>' +
-      '<span class="fbox"></span>' + c.label + '<span class="cnt">' + n + '</span></label>';
-  }).join('');
-
-  var grid = document.getElementById('grid');
+  var grid  = document.getElementById('grid');
   var chips = document.getElementById('chips');
+  var fcats = document.getElementById('f-cats');
+
+  grid.innerHTML = '<p style="padding:2rem;color:var(--muted)">Carregando produtos...</p>';
+
+  function buildFilterCats() {
+    fcats.innerHTML = CATS.map(function (c) {
+      var n  = ALL_PRODUCTS.filter(function (p) { return p.cat === c.key; }).length;
+      var on = state.cats.indexOf(c.key) > -1 ? 'checked' : '';
+      return '<label class="fopt"><input type="checkbox" value="' + c.key + '" ' + on + '>' +
+        '<span class="fbox"></span>' + c.label + '<span class="cnt">' + n + '</span></label>';
+    }).join('');
+    fcats.addEventListener('change', function (e) {
+      var v = e.target.value;
+      if (e.target.checked) { if (state.cats.indexOf(v) === -1) state.cats.push(v); }
+      else state.cats = state.cats.filter(function (x) { return x !== v; });
+      apply();
+    });
+  }
 
   function apply() {
-    var list = P.filter(function (p) {
+    var maxP = state.maxPrice;
+    var list = ALL_PRODUCTS.filter(function (p) {
       if (state.cats.length && state.cats.indexOf(p.cat) === -1) return false;
-      if (p.price > state.maxPrice) return false;
-      if (state.color && p.cols.indexOf(state.color) === -1) return false;
+      if (p.price > maxP) return false;
       return true;
     });
-    if (state.sort === 'price-asc') list.sort(function (a, b) { return a.price - b.price; });
+    if (state.sort === 'price-asc')  list.sort(function (a, b) { return a.price - b.price; });
     if (state.sort === 'price-desc') list.sort(function (a, b) { return b.price - a.price; });
-    if (state.sort === 'rating') list.sort(function (a, b) { return b.rating - a.rating; });
 
     document.getElementById('res-count').textContent = list.length;
     grid.innerHTML = list.length
-      ? list.map(function (p) { return window.tieCard(p); }).join('')
+      ? list.map(function (p) { return window.tieCard(p, { reveal: true }); }).join('')
       : '<div class="cat-empty"><p style="font-family:var(--font-head);font-size:1.4rem;color:var(--texto)">Nenhuma peça com esses filtros 🎀</p><p>Tente afrouxar os filtros.</p></div>';
 
-    // chips ativos
+    if (window.TIE && window.TIE.observeReveal) window.TIE.observeReveal();
+
     var c = [];
     state.cats.forEach(function (k) {
       var lbl = (CATS.find(function (x) { return x.key === k; }) || {}).label || k;
       c.push('<span class="chip">' + lbl + '<button type="button" data-rm-cat="' + k + '" aria-label="Remover">✕</button></span>');
     });
-    if (state.maxPrice < 180) c.push('<span class="chip">até ' + brl(state.maxPrice) + '<button type="button" data-rm-price aria-label="Remover">✕</button></span>');
-    if (state.color) c.push('<span class="chip">cor<button type="button" data-rm-color aria-label="Remover">✕</button></span>');
+    if (state.maxPrice < 500) c.push('<span class="chip">até ' + brl(state.maxPrice) + '<button type="button" data-rm-price aria-label="Remover">✕</button></span>');
     chips.innerHTML = c.join('');
   }
 
-  // Eventos categoria
-  fcats.addEventListener('change', function (e) {
-    var v = e.target.value;
-    if (e.target.checked) { if (state.cats.indexOf(v) === -1) state.cats.push(v); }
-    else state.cats = state.cats.filter(function (x) { return x !== v; });
+  window.SHOPIFY.fetchProducts(50, 3).then(function (products) {
+    ALL_PRODUCTS = products;
+    window.TIE_PRODUCTS = products;
+    buildFilterCats();
     apply();
   });
-  // Preço
+
   var price = document.getElementById('f-price');
+  price.max = 500;
+  price.value = 500;
   price.addEventListener('input', function () {
     state.maxPrice = +price.value;
     document.getElementById('f-price-val').textContent = brl(state.maxPrice);
     apply();
   });
-  // Cor
-  document.getElementById('f-colors').addEventListener('click', function (e) {
-    var b = e.target.closest('button'); if (!b) return;
-    var col = b.dataset.col;
-    if (state.color === col) { state.color = null; b.classList.remove('on'); }
-    else {
-      state.color = col;
-      this.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
-      b.classList.add('on');
-    }
-    apply();
-  });
-  // Sort
+
   document.getElementById('sort').addEventListener('change', function () { state.sort = this.value; apply(); });
-  // Clear
+
   document.getElementById('f-clear').addEventListener('click', function () {
-    state.cats = []; state.maxPrice = 180; state.color = null;
+    state.cats = []; state.maxPrice = 500; state.color = null;
     fcats.querySelectorAll('input').forEach(function (i) { i.checked = false; });
-    price.value = 180; document.getElementById('f-price-val').textContent = brl(180);
-    document.querySelectorAll('#f-colors button').forEach(function (x) { x.classList.remove('on'); });
+    price.value = 500; document.getElementById('f-price-val').textContent = brl(500);
     apply();
   });
-  // Chips remover
+
   chips.addEventListener('click', function (e) {
     var t = e.target;
     if (t.dataset.rmCat) {
       state.cats = state.cats.filter(function (x) { return x !== t.dataset.rmCat; });
       var inp = fcats.querySelector('input[value="' + t.dataset.rmCat + '"]'); if (inp) inp.checked = false;
     }
-    if (t.hasAttribute('data-rm-price')) { state.maxPrice = 180; price.value = 180; document.getElementById('f-price-val').textContent = brl(180); }
-    if (t.hasAttribute('data-rm-color')) { state.color = null; document.querySelectorAll('#f-colors button').forEach(function (x) { x.classList.remove('on'); }); }
+    if (t.hasAttribute('data-rm-price')) { state.maxPrice = 500; price.value = 500; document.getElementById('f-price-val').textContent = brl(500); }
     apply();
   });
 
-  // Drawer filtros (mobile)
   var filters = document.getElementById('filters');
-  var scrim = document.getElementById('filters-scrim');
-  function openF() { filters.classList.add('open'); scrim.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  var scrim   = document.getElementById('filters-scrim');
+  function openF()  { filters.classList.add('open');    scrim.classList.add('open');    document.body.style.overflow = 'hidden'; }
   function closeF() { filters.classList.remove('open'); scrim.classList.remove('open'); document.body.style.overflow = ''; }
   document.querySelector('.js-filters-open').addEventListener('click', openF);
   document.querySelector('.js-filters-close').addEventListener('click', closeF);
   scrim.addEventListener('click', closeF);
-
-  apply();
 })();
 </script>
 

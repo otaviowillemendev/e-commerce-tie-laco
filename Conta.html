@@ -95,45 +95,116 @@
 <div id="tie-bottom"></div>
 <div id="tie-tweaks-root"></div>
 
+<script src="/scripts/shopify-client.js"></script>
 <script src="/scripts/products.js"></script>
 <script src="/scripts/chrome.js"></script>
 <script src="/scripts/tie.js"></script>
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-<script type="text/babel" src="/tweaks-panel.jsx"></script>
-<script type="text/babel" src="/scripts/tie-tweaks.jsx"></script>
 
 <script>
 (function () {
   var params = new URLSearchParams(location.search);
+
   function show(which) {
     document.querySelectorAll('.authtabs button').forEach(function (b) { b.classList.toggle('on', b.dataset.auth === which); });
     document.querySelectorAll('.authform').forEach(function (f) { f.classList.toggle('on', f.dataset.form === which); });
   }
+
   if (params.get('tab') === 'signup') show('signup');
+
+  // Se já estiver logado, mostra painel de conta
+  if (window.SHOPIFY.getCustomerToken()) {
+    document.querySelector('.auth__main').innerHTML =
+      '<div class="auth__card" style="text-align:center;padding:3rem">' +
+      '<div class="auth__brand"><img src="assets/tie-logo.png" alt="Tie Laços" /></div>' +
+      '<h2 style="margin:1.5rem 0 .5rem">Bem-vinda de volta! 🎀</h2>' +
+      '<p style="color:var(--muted);margin-bottom:2rem">Você já está conectada à sua conta.</p>' +
+      '<a class="btn btn--block" href="Home.html">Continuar comprando</a>' +
+      '<button class="btn btn--block" id="js-logout" type="button" style="margin-top:1rem;background:transparent;color:var(--rosa-escuro);border:1.5px solid var(--rosa-escuro)">Sair da conta</button>' +
+      '</div>';
+    document.getElementById('js-logout').addEventListener('click', function () {
+      window.SHOPIFY.customerLogout().then(function () {
+        window.TIE.toast('Até logo! 🎀');
+        setTimeout(function () { location.reload(); }, 900);
+      });
+    });
+    return;
+  }
+
   document.querySelector('.authtabs').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (b) show(b.dataset.auth);
   });
   document.querySelector('.js-go-signup').addEventListener('click', function (e) { e.preventDefault(); show('signup'); });
   document.querySelector('.js-go-login').addEventListener('click', function (e) { e.preventDefault(); show('login'); });
 
-  document.querySelectorAll('.js-authform').forEach(function (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var ok = true;
-      form.querySelectorAll('[required]').forEach(function (inp) {
-        var bad = (inp.type === 'checkbox') ? !inp.checked
-          : (inp.type === 'email') ? !/\S+@\S+\.\S+/.test(inp.value)
-          : (inp.name === 'pass') ? inp.value.length < 6
-          : !inp.value.trim();
-        if (inp.classList) inp.classList.toggle('bad', bad && inp.type !== 'checkbox');
-        if (bad) ok = false;
-      });
-      if (!ok) { window.TIE.toast('Confira os campos, por favor 🎀'); return; }
-      window.TIE.toast(form.dataset.form === 'login' ? 'Bem-vinda de volta! 🎀' : 'Conta criada com carinho! 🎀');
-      setTimeout(function () { location.href = 'Home.html'; }, 1100);
+  // ── Login ────────────────────────────────────────────────────
+  var loginForm = document.querySelector('[data-form="login"]');
+  loginForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = loginForm.querySelector('[name="email"]').value.trim();
+    var pass  = loginForm.querySelector('[name="pass"]').value;
+    var btn   = loginForm.querySelector('[type="submit"]');
+
+    var ok = true;
+    if (!/\S+@\S+\.\S+/.test(email)) { loginForm.querySelector('[name="email"]').classList.add('bad'); ok = false; }
+    if (pass.length < 5) { loginForm.querySelector('[name="pass"]').classList.add('bad'); ok = false; }
+    if (!ok) { window.TIE.toast('Confira os campos. 🎀'); return; }
+
+    btn.disabled = true; btn.textContent = 'Entrando...';
+    window.SHOPIFY.customerLogin(email, pass).then(function (res) {
+      if (res.error) {
+        window.TIE.toast('Erro: ' + res.error);
+        btn.disabled = false; btn.textContent = 'Entrar';
+        return;
+      }
+      window.TIE.toast('Bem-vinda de volta! 🎀');
+      setTimeout(function () { location.href = 'Home.html'; }, 900);
     });
+  });
+
+  // ── Cadastro ─────────────────────────────────────────────────
+  var signupForm = document.querySelector('[data-form="signup"]');
+  signupForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name  = signupForm.querySelector('[name="name"]').value.trim();
+    var email = signupForm.querySelector('[name="email"]').value.trim();
+    var pass  = signupForm.querySelector('[name="pass"]').value;
+    var phone = signupForm.querySelector('[name="phone"]').value.trim();
+    var terms = signupForm.querySelector('[type="checkbox"]');
+    var btn   = signupForm.querySelector('[type="submit"]');
+
+    var ok = true;
+    if (!name) { signupForm.querySelector('[name="name"]').classList.add('bad'); ok = false; }
+    if (!/\S+@\S+\.\S+/.test(email)) { signupForm.querySelector('[name="email"]').classList.add('bad'); ok = false; }
+    if (pass.length < 5) { signupForm.querySelector('[name="pass"]').classList.add('bad'); ok = false; }
+    if (!terms.checked) { window.TIE.toast('Aceite os termos para continuar. 🎀'); ok = false; }
+    if (!ok) { window.TIE.toast('Confira os campos. 🎀'); return; }
+
+    var parts = name.split(' ');
+    var firstName = parts[0];
+    var lastName  = parts.slice(1).join(' ') || '';
+
+    btn.disabled = true; btn.textContent = 'Criando conta...';
+    window.SHOPIFY.customerCreate({ firstName: firstName, lastName: lastName, email: email, password: pass, phone: phone || undefined })
+      .then(function (res) {
+        if (res.error) {
+          window.TIE.toast('Erro: ' + res.error);
+          btn.disabled = false; btn.textContent = 'Criar minha conta';
+          return;
+        }
+        // Faz login automático após cadastro
+        return window.SHOPIFY.customerLogin(email, pass);
+      })
+      .then(function (res) {
+        if (!res) return;
+        if (res.error) { window.TIE.toast('Conta criada! Faça login para continuar.'); show('login'); return; }
+        window.TIE.toast('Conta criada com carinho! Bem-vinda 🎀');
+        setTimeout(function () { location.href = 'Home.html'; }, 900);
+      });
+  });
+
+  // Remove classe bad ao digitar
+  document.querySelectorAll('.authform input').forEach(function (inp) {
+    inp.addEventListener('input', function () { inp.classList.remove('bad'); });
   });
 })();
 </script>

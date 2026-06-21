@@ -126,105 +126,172 @@
 <div id="tie-bottom"></div>
 <div id="tie-tweaks-root"></div>
 
+<script src="/scripts/shopify-client.js"></script>
 <script src="/scripts/products.js"></script>
 <script src="/scripts/chrome.js"></script>
 <script src="/scripts/tie.js"></script>
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-<script type="text/babel" src="/tweaks-panel.jsx"></script>
-<script type="text/babel" src="/scripts/tie-tweaks.jsx"></script>
 
 <script>
 (function () {
   var brl = window.tieBRL;
   var params = new URLSearchParams(location.search);
-  var id = params.get('id') || 'p1';
-  var p = window.tieProduct(id) || window.TIE_PRODUCTS[0];
-  var colNames = { '#E0579A':'Rosa', '#C4167A':'Rosa escuro', '#7C2D6E':'Vinho', '#F8D7EA':'Rosa clarinho', '#FFFFFF':'Branco' };
+  var handle = params.get('handle');
 
-  document.title = p.name + ' · Tie Laços';
-  document.getElementById('pdp-crumb').textContent = p.name;
-  document.getElementById('pdp-cat').textContent = p.cat;
-  document.getElementById('pdp-title').textContent = p.name;
-  document.getElementById('pdp-rate').textContent = (p.rating + '').replace('.', ',');
-  document.getElementById('pdp-reviews').textContent = p.reviews + ' avaliações';
-  document.getElementById('pdp-price').textContent = brl(p.price);
-  document.getElementById('pdp-main').setAttribute('data-label', 'foto · ' + p.name);
-  if (p.old) {
-    document.getElementById('pdp-old').textContent = brl(p.old);
-    document.getElementById('pdp-old').style.display = '';
-    var pct = Math.round((1 - p.price / p.old) * 100);
-    var save = document.getElementById('pdp-save');
-    save.textContent = '-' + pct + '%'; save.style.display = '';
-  }
-  document.getElementById('pdp-install').innerHTML = 'ou <b>3x de ' + brl(p.price / 3) + '</b> sem juros';
-  if (p.badge) {
-    var b = document.getElementById('pdp-badge');
-    b.textContent = p.badge; b.style.display = '';
-    if (p.alt) b.style.background = 'var(--vinho)';
+  // Se vier ?id= legado, redireciona para o catálogo
+  if (!handle) {
+    var legacyId = params.get('id');
+    if (legacyId) {
+      window.location.replace('Catalogo.html');
+      return;
+    }
+    window.location.replace('Catalogo.html');
+    return;
   }
 
-  // Thumbs
-  document.getElementById('pdp-thumbs').innerHTML = [0,1,2,3].map(function (i) {
-    return '<div class="gthumb' + (i === 0 ? ' on' : '') + '"><span class="ph" data-label="' + (i+1) + '"></span></div>';
-  }).join('');
-  document.getElementById('pdp-thumbs').addEventListener('click', function (e) {
-    var t = e.target.closest('.gthumb'); if (!t) return;
-    this.querySelectorAll('.gthumb').forEach(function (x) { x.classList.remove('on'); });
-    t.classList.add('on');
-  });
+  var currentVariantId = null;
+  var currentQty = 1;
 
-  // Cores
-  var colorname = document.getElementById('pdp-colorname');
-  colorname.textContent = colNames[p.cols[0]] || '';
-  document.getElementById('pdp-colors').innerHTML = p.cols.map(function (c, i) {
-    return '<button class="color-opt' + (i === 0 ? ' on' : '') + '" type="button" data-col="' + c + '" style="background:' + c + '" aria-label="' + (colNames[c] || c) + '"></button>';
-  }).join('');
-  document.getElementById('pdp-colors').addEventListener('click', function (e) {
-    var b = e.target.closest('.color-opt'); if (!b) return;
-    this.querySelectorAll('.color-opt').forEach(function (x) { x.classList.remove('on'); });
-    b.classList.add('on');
-    colorname.textContent = colNames[b.dataset.col] || '';
-  });
+  function renderProduct(p) {
+    document.title = p.name + ' · Tie Laços';
+    document.getElementById('pdp-crumb').textContent = p.name;
+    document.getElementById('pdp-cat').textContent = p.cat;
+    document.getElementById('pdp-title').textContent = p.name;
+    document.getElementById('pdp-price').textContent = brl(p.price);
 
-  // Tamanho
-  document.querySelectorAll('.size-opt').forEach(function (s) {
-    s.addEventListener('click', function () {
-      document.querySelectorAll('.size-opt').forEach(function (x) { x.classList.remove('on'); });
-      s.classList.add('on');
+    if (p.old) {
+      document.getElementById('pdp-old').textContent = brl(p.old);
+      document.getElementById('pdp-old').style.display = '';
+      var pct = Math.round((1 - p.price / p.old) * 100);
+      var save = document.getElementById('pdp-save');
+      save.textContent = '-' + pct + '%'; save.style.display = '';
+    }
+    document.getElementById('pdp-install').innerHTML = 'ou <b>3x de ' + brl(p.price / 3) + '</b> sem juros';
+
+    if (p.badge) {
+      var bd = document.getElementById('pdp-badge');
+      bd.textContent = p.badge; bd.style.display = '';
+      if (p.alt) bd.style.background = 'var(--vinho)';
+    }
+
+    // Descrição real do Shopify
+    if (p.descriptionHtml) {
+      var desc = document.querySelector('[data-panel="desc"]');
+      if (desc) desc.innerHTML = p.descriptionHtml;
+    }
+
+    // Galeria de imagens reais
+    var mainEl = document.getElementById('pdp-main');
+    var thumbsEl = document.getElementById('pdp-thumbs');
+    var imgs = p.images.length ? p.images : (p.img ? [p.img] : []);
+
+    if (imgs.length) {
+      mainEl.outerHTML = '<img id="pdp-main" src="' + imgs[0] + '" alt="' + p.name + '" style="width:100%;height:100%;object-fit:cover;border-radius:16px" />';
+      var mainImg = document.getElementById('pdp-main');
+      thumbsEl.innerHTML = imgs.map(function (url, i) {
+        return '<div class="gthumb' + (i === 0 ? ' on' : '') + '" data-img="' + url + '">' +
+          '<img src="' + url + '" alt="' + p.name + ' ' + (i+1) + '" style="width:100%;height:100%;object-fit:cover;border-radius:10px" /></div>';
+      }).join('');
+      thumbsEl.addEventListener('click', function (e) {
+        var t = e.target.closest('.gthumb'); if (!t) return;
+        thumbsEl.querySelectorAll('.gthumb').forEach(function (x) { x.classList.remove('on'); });
+        t.classList.add('on');
+        mainImg.src = t.dataset.img;
+      });
+    } else {
+      thumbsEl.innerHTML = '';
+    }
+
+    // Variantes com cores
+    var variants = p.variants;
+    currentVariantId = variants.length ? variants[0].id : null;
+
+    var colorOpt = (p.cols && p.cols.length);
+    var colorname = document.getElementById('pdp-colorname');
+
+    if (colorOpt) {
+      colorname.textContent = p.cols[0];
+      document.getElementById('pdp-colors').innerHTML = p.cols.map(function (c, i) {
+        // Encontra a variante correspondente à cor
+        var variant = variants.find(function (v) {
+          return v.selectedOptions && v.selectedOptions.some(function (o) {
+            return ['cor', 'color', 'colour'].indexOf(o.name.toLowerCase()) > -1 && o.value === c;
+          });
+        }) || variants[i] || variants[0];
+        return '<button class="color-opt' + (i === 0 ? ' on' : '') + '" type="button"' +
+          ' data-col="' + c + '" data-variant-id="' + variant.id + '"' +
+          ' title="' + c + '">' +
+          c.charAt(0).toUpperCase() +
+          '</button>';
+      }).join('');
+      document.getElementById('pdp-colors').addEventListener('click', function (e) {
+        var btn = e.target.closest('.color-opt'); if (!btn) return;
+        this.querySelectorAll('.color-opt').forEach(function (x) { x.classList.remove('on'); });
+        btn.classList.add('on');
+        colorname.textContent = btn.dataset.col;
+        currentVariantId = btn.dataset.variantId;
+        // Atualiza preço da variante selecionada
+        var selVariant = variants.find(function (v) { return v.id === currentVariantId; });
+        if (selVariant && selVariant.price) {
+          document.getElementById('pdp-price').textContent = brl(parseFloat(selVariant.price.amount));
+        }
+      });
+    } else {
+      document.getElementById('pdp-colors').innerHTML = '';
+      document.getElementById('pdp-colors').parentElement.style.display = 'none';
+    }
+
+    // Quantidade
+    var qval = document.getElementById('qval');
+    document.getElementById('qminus').addEventListener('click', function () {
+      currentQty = Math.max(1, currentQty - 1); qval.textContent = currentQty;
     });
-  });
-
-  // Qtd
-  var q = 1;
-  var qval = document.getElementById('qval');
-  document.getElementById('qminus').addEventListener('click', function () { q = Math.max(1, q - 1); qval.textContent = q; });
-  document.getElementById('qplus').addEventListener('click', function () { q = Math.min(20, q + 1); qval.textContent = q; });
-
-  // Add to cart
-  document.querySelector('.js-pdp-add').addEventListener('click', function () {
-    window.TIE.addToCart({ id: p.id, name: p.name, price: p.price, cat: p.cat, qty: q });
-    window.TIE.toast('Adicionado ao carrinho!');
-    window.TIE.openCart();
-  });
-
-  // Abas
-  document.querySelector('.tabbar').addEventListener('click', function (e) {
-    var b = e.target.closest('button'); if (!b) return;
-    this.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
-    b.classList.add('on');
-    document.querySelectorAll('.tabpanel').forEach(function (pnl) {
-      pnl.classList.toggle('on', pnl.dataset.panel === b.dataset.tab);
+    document.getElementById('qplus').addEventListener('click', function () {
+      currentQty = Math.min(20, currentQty + 1); qval.textContent = currentQty;
     });
-  });
 
-  // Relacionados (mesma categoria, exceto o atual)
-  var rel = window.TIE_PRODUCTS.filter(function (x) { return x.cat === p.cat && x.id !== p.id; });
-  if (rel.length < 4) {
-    window.TIE_PRODUCTS.forEach(function (x) { if (x.id !== p.id && rel.indexOf(x) === -1 && rel.length < 4) rel.push(x); });
+    // Botão adicionar ao carrinho
+    document.querySelector('.js-pdp-add').addEventListener('click', function () {
+      if (!currentVariantId) { window.TIE.toast('Selecione uma cor.'); return; }
+      var btn = this; btn.disabled = true;
+      window.SHOPIFY.cartLinesAdd([{ merchandiseId: currentVariantId, quantity: currentQty }])
+        .then(function (cart) {
+          // tie.js.renderShopifyCart atualiza o drawer
+          if (window.TIE && window.TIE.loadCart) window.TIE.loadCart();
+          window.TIE.toast('Adicionado ao carrinho! 🎀');
+          window.TIE.openCart();
+          btn.disabled = false;
+        })
+        .catch(function () { window.TIE.toast('Erro ao adicionar.'); btn.disabled = false; });
+    });
+
+    // Abas
+    document.querySelector('.tabbar').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      this.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
+      b.classList.add('on');
+      document.querySelectorAll('.tabpanel').forEach(function (pnl) {
+        pnl.classList.toggle('on', pnl.dataset.panel === b.dataset.tab);
+      });
+    });
+
+    // Produtos relacionados
+    window.SHOPIFY.fetchRelated(p.id).then(function (related) {
+      var relEl = document.getElementById('related');
+      if (!related.length) { relEl.parentElement.style.display = 'none'; return; }
+      relEl.innerHTML = related.map(function (r) { return window.tieCard(r); }).join('');
+    });
   }
-  document.getElementById('related').innerHTML = rel.slice(0, 4).map(function (x) { return window.tieCard(x); }).join('');
+
+  // Busca produto pelo handle
+  window.SHOPIFY.fetchProduct(handle).then(function (product) {
+    if (!product) {
+      document.querySelector('.pdp').innerHTML = '<div style="padding:4rem;text-align:center">' +
+        '<h2>Produto não encontrado</h2>' +
+        '<a class="btn" href="Catalogo.html" style="margin-top:1rem;display:inline-block">Ver catálogo</a></div>';
+      return;
+    }
+    renderProduct(product);
+  });
 })();
 </script>
 
