@@ -14,122 +14,178 @@ export const shopify = createStorefrontApiClient({
 
 // ── Helpers ──────────────────────────────────────────────────
 
-/** Converte handle Shopify → formato interno Tie */
-export function toTieProduct(shopifyProduct) {
+/** Calcula badge automaticamente — sem tags manuais */
+function autoBadge(shopifyProduct, isBestSeller = false) {
+  const type = (shopifyProduct.productType || '').toLowerCase();
+  if (type === 'kits') return 'kit';
+  if (isBestSeller) return 'mais vendido';
+  const createdAt = new Date(shopifyProduct.createdAt);
+  const diasAtras = (Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+  if (diasAtras <= 30) return 'novo';
+  return null;
+}
+
+/** Converte produto Shopify → formato interno Tie */
+export function toTieProduct(shopifyProduct, isBestSeller = false) {
   const v = shopifyProduct.variants?.edges?.[0]?.node ?? {};
   const img = shopifyProduct.featuredImage?.url ?? null;
   const images = (shopifyProduct.images?.edges ?? []).map((e) => e.node.url);
+  const price = parseFloat(v.price?.amount ?? 0);
+  const old   = v.compareAtPrice ? parseFloat(v.compareAtPrice.amount) : null;
+
+  // Cores: lê opção "Cor" ou "Color" — insensível a maiúsculas
+  const corOption = shopifyProduct.options
+    ?.find((o) => ['cor', 'color', 'colour'].includes(o.name.toLowerCase()));
+
+  // Todas as variantes para montar seletor completo
+  const variants = (shopifyProduct.variants?.edges ?? []).map((e) => e.node);
+
   return {
-    id:        shopifyProduct.id,
-    handle:    shopifyProduct.handle,
-    name:      shopifyProduct.title,
-    cat:       shopifyProduct.productType || 'Laços',
-    price:     parseFloat(v.price?.amount ?? 0),
-    old:       v.compareAtPrice ? parseFloat(v.compareAtPrice.amount) : null,
-    badge:     shopifyProduct.tags?.find((t) => ['mais vendido','novo','kit'].includes(t)) ?? null,
-    rating:    5.0,   // Shopify não tem rating nativo — use app de reviews depois
-    reviews:   0,
-    cols:      shopifyProduct.options
-                 ?.find((o) => o.name.toLowerCase() === 'cor')
-                 ?.values ?? [],
+    id:          shopifyProduct.id,
+    handle:      shopifyProduct.handle,
+    name:        shopifyProduct.title,
+    cat:         shopifyProduct.productType || 'Laços',
+    price,
+    old,
+    badge:       autoBadge(shopifyProduct, isBestSeller),
+    alt:         isBestSeller, // badge escuro para mais vendidos
+    rating:      5.0,
+    reviews:     0,
+    cols:        corOption?.values ?? [],
     img,
     images,
-    variantId: v.id,
-    available: v.availableForSale ?? true,
+    variantId:   v.id,
+    available:   v.availableForSale ?? true,
+    variants,    // lista completa de variantes com preço e opções
+    createdAt:   shopifyProduct.createdAt,
   };
 }
 
+// ── Fragment reutilizável ─────────────────────────────────────
+
+const PRODUCT_FRAGMENT = `
+  fragment ProductFields on Product {
+    id handle title productType createdAt
+    featuredImage { url altText }
+    images(first: 8) { edges { node { url altText } } }
+    options { name values }
+    variants(first: 20) {
+      edges {
+        node {
+          id title availableForSale
+          selectedOptions { name value }
+          price { amount currencyCode }
+          compareAtPrice { amount currencyCode }
+          image { url altText }
+        }
+      }
+    }
+  }
+`;
+
 // ── Queries ──────────────────────────────────────────────────
 
-/** Busca todos os produtos (máx. 250) */
-export async function fetchProducts(first = 50) {
+/**
+ * Busca todos os produtos ordenados por relevância.
+ * Os primeiros `bestSellerCount` recebem badge "mais vendido" automaticamente.
+ */
+export async function fetchProducts(first = 50, bestSellerCount = 3) {
   const { data, errors } = await shopify.request(`
     query Products($first: Int!) {
-      products(first: $first) {
+      products(first: $first, sortKey: BEST_SELLING) {
+        edges { node { ...ProductFields } }
+      }
+    }
+    ${PRODUCT_FRAGMENT}
+  `, { variables: { first } });
+
+  if (errors) { console.error('[Shopify] fetchProducts:', errors); return []; }
+  return data.products.edges.map((e, i) =>
+    toTieProduct(e.node, i < bestSellerCount)
+  );
+}
+
+/**
+ * Busca um produto pelo handle.
+ * Retorna também descriptionHtml para a página de produto.
+ */
+export async function fetchProduct(handle) {
+  const { data, errors } = await shopify.request(`
+    query Product($handle: String!) {
+      product(handle: $handle) {
+        ...ProductFields
+        descriptionHtml
+        seo { title description }
+      }
+    }
+    ${PRODUCT_FRAGMENT}
+  `, { variables: { handle } });
+
+  if (errors) { console.error('[Shopify] fetchProduct:', errors); return null; }
+  return data.product ? toTieProduct(data.product) : null;
+}
+
+/**
+ * Busca produtos de uma coleção pelo handle.
+ * Coleções criadas no Shopify Admin controlam curadoria (ex: "Lançamentos", "Destaque").
+ */
+export async function fetchCollection(handle, first = 50) {
+  const { data, errors } = await shopify.request(`
+    query Collection($handle: String!, $first: Int!) {
+      collection(handle: $handle) {
+        title description
+        products(first: $first, sortKey: BEST_SELLING) {
+          edges { node { ...ProductFields } }
+        }
+      }
+    }
+    ${PRODUCT_FRAGMENT}
+  `, { variables: { handle, first } });
+
+  if (errors) { console.error('[Shopify] fetchCollection:', errors); return []; }
+  const col = data.collection;
+  if (!col) return [];
+  return col.products.edges.map((e) => toTieProduct(e.node));
+}
+
+/**
+ * Busca todas as coleções da loja.
+ * Usado para montar menu de categorias dinamicamente.
+ */
+export async function fetchCollections(first = 20) {
+  const { data, errors } = await shopify.request(`
+    query Collections($first: Int!) {
+      collections(first: $first) {
         edges {
           node {
-            id handle title productType tags
-            featuredImage { url altText }
-            images(first: 4) { edges { node { url altText } } }
-            options { name values }
-            variants(first: 1) {
-              edges {
-                node {
-                  id availableForSale
-                  price { amount currencyCode }
-                  compareAtPrice { amount currencyCode }
-                }
-              }
-            }
+            id handle title
+            image { url altText }
+            products(first: 1) { edges { node { id } } }
           }
         }
       }
     }
   `, { variables: { first } });
 
-  if (errors) { console.error('[Shopify] fetchProducts:', errors); return []; }
-  return data.products.edges.map((e) => toTieProduct(e.node));
+  if (errors) { console.error('[Shopify] fetchCollections:', errors); return []; }
+  return data.collections.edges.map((e) => e.node);
 }
 
-/** Busca um produto pelo handle (ex: "laco-boutique-cereja") */
-export async function fetchProduct(handle) {
+/**
+ * Busca produtos relacionados (mesma coleção/tipo, exceto o atual).
+ */
+export async function fetchRelated(productId, first = 4) {
   const { data, errors } = await shopify.request(`
-    query Product($handle: String!) {
-      productByHandle(handle: $handle) {
-        id handle title productType descriptionHtml tags
-        featuredImage { url altText }
-        images(first: 8) { edges { node { url altText } } }
-        options { name values }
-        variants(first: 20) {
-          edges {
-            node {
-              id title availableForSale
-              selectedOptions { name value }
-              price { amount currencyCode }
-              compareAtPrice { amount currencyCode }
-            }
-          }
-        }
+    query Related($productId: ID!, $first: Int!) {
+      productRecommendations(productId: $productId) {
+        ...ProductFields
       }
     }
-  `, { variables: { handle } });
+    ${PRODUCT_FRAGMENT}
+  `, { variables: { productId, first } });
 
-  if (errors) { console.error('[Shopify] fetchProduct:', errors); return null; }
-  return data.productByHandle ? toTieProduct(data.productByHandle) : null;
-}
-
-/** Busca produtos de uma coleção pelo handle */
-export async function fetchCollection(handle, first = 50) {
-  const { data, errors } = await shopify.request(`
-    query Collection($handle: String!, $first: Int!) {
-      collectionByHandle(handle: $handle) {
-        title
-        products(first: $first) {
-          edges {
-            node {
-              id handle title productType tags
-              featuredImage { url altText }
-              options { name values }
-              variants(first: 1) {
-                edges {
-                  node {
-                    id availableForSale
-                    price { amount currencyCode }
-                    compareAtPrice { amount currencyCode }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  `, { variables: { handle, first } });
-
-  if (errors) { console.error('[Shopify] fetchCollection:', errors); return []; }
-  const col = data.collectionByHandle;
-  if (!col) return [];
-  return col.products.edges.map((e) => toTieProduct(e.node));
+  if (errors) { console.error('[Shopify] fetchRelated:', errors); return []; }
+  return (data.productRecommendations ?? []).slice(0, first).map((p) => toTieProduct(p));
 }
 
 // ── Carrinho ─────────────────────────────────────────────────
